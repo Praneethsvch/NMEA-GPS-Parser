@@ -148,10 +148,10 @@ void parse_gga(char *sentence){
 void parse_gll(char *sentence){
     gll_data data;
     // Decode the $GPGLL sentence
-        char *p = sentence;
+    char *p = sentence;
     p = strchr(p, ',')+1;
-        int index = 1;
-        while (p != NULL){
+    int index = 1;
+    while (p != NULL){
         if(*p!='*' && *p!='$'){
             switch (index) {
                 case 1:
@@ -185,7 +185,7 @@ void parse_gll(char *sentence){
             index++;
         else 
             break;
-        }
+    }
     printf("\nLatitude: %.4f %c\n", data.latitude, data.latitude_dir);
     printf("Longitude: %.4f %c\n", data.longitude, data.longitude_dir);
     printf("Time(hhmmss.ss): %.2f \n", data.time);
@@ -262,11 +262,11 @@ void parse_gsa(char *sentence){
 void parse_gsv(char *sentence){
     gsv_data data;
     char *p = sentence;
-        int sat_index = 0;
+    int sat_index = 0;
     p = strchr(p, ',') + 1;
     int index = 1;
     while( p!= NULL){
-        if(*p!='*' && *p!=',' && *p!='$'){
+        if(*p!='*' && *p!='$'){
             // not empty
             switch (index) {
             case 1:
@@ -317,4 +317,205 @@ void parse_gsv(char *sentence){
         printf("\tSNR: %d\n", data.satellites[i].snr);
     }
     printf("\n\n");
+}
+
+
+void parse_mss(char *sentence){
+    mss_data data;
+    char *p = sentence;
+    p = strchr(p, ',') + 1;
+    int index = 1;  
+    while (p != NULL){
+        if(*p!='$' && *p!='*'){
+            switch(index){
+                case 1:
+                    data.signalStrength = atof(p);
+                    break;
+                case 2:
+                    data.snr = atof(p);
+                    break;
+                case 3:
+                    data.beacon_freq = atof(p);
+                    break;
+                case 4:
+                    data.beacon_bitrate = atoi(p);
+                    break;
+                case 5:
+                    data.channel_number = atoi(p);
+                    break;
+                }   
+                if (index<5)
+                    p = strchr(p, ',') + 1;
+        } else if (*p == '$'){
+            break;
+        }
+        if(index<5)
+            index++;
+        else
+            break;
+    }
+    printf("\nSignal strength is: %.2f\n", data.signalStrength);
+    printf("Signal to Noise ratio: %.2f\n", data.snr);
+    printf("Beacon frequency(KHz): %.2f\n", data.beacon_freq);
+    printf("Beacon bitrate (bits per second) : %d\n", data.beacon_bitrate);
+    printf("Channel number: %d\n\n\n", data.channel_number);
+}
+
+
+void parse_rmc(char *sentence){
+    rmc_data data;
+    char *p = sentence;
+    p = strchr(p, ',') + 1;
+    int index = 1;  
+    while (p != NULL){
+        if(*p!='$' && *p!='*'){
+            switch(index) {
+            case 1:
+                data.time = atof(p);
+                break;
+            case 2:
+                data.status = *p;
+                break;
+            case 3:
+                data.latitude = atof(p);
+                break;
+            case 4:
+                data.latitude_dir = *p;
+                break;
+            case 5:
+                data.longitude = atof(p);
+                break;
+            case 6:
+                data.longitude_dir = *p;
+                break;
+            case 7:
+                data.speed = atof(p);
+                break;
+            case 8:
+                data.heading = atof(p);
+                break;
+            case 9:
+                data.date = atol(p);
+                break;
+            case 10:
+                data.magnetic_variation = atof(p);
+                break;
+            case 11:
+                data.direction = *p;
+                break;
+            case 12:
+                data.mode = *p;
+                break;
+            }
+            if (index<12)
+                p = strchr(p, ',') + 1;
+        } else if (*p == '$'){
+            break;
+        }
+        if(index<12)
+            index++;
+        else
+            break;
+    }
+    printf("\nTime UTC (hhmmss.sss): %.3f\n", data.time);
+    printf("Status %s\n", data.status=='A'?"Valid data.":"Invalid data.");
+    printf("Latitude: %.4f %c\n", data.latitude, data.latitude_dir);
+    printf("Longitude: %.4f %c\n", data.longitude, data.longitude_dir);
+    printf("Speed over ground: %.4f knots\n", data.speed);
+    printf("Course over ground: %.4f degrees\n", data.heading);
+    printf("Date (ddmmyy): %ld\n", data.date);
+    printf("Magnetic variation: %f degrees %c\n", data.magnetic_variation, data.direction);
+    printf("Mode: %c\n\n\n", data.mode);
+}
+
+void parse_vtg(char *sentence){
+    vtg_data data;
+    char *p = sentence;
+    p = strchr(p, ',') + 1;
+    int index = 1;  
+    while (p != NULL){
+        if(*p!='$' && *p!='*'){
+            switch(index){
+            case 1:
+                data.course1 = atof(p);
+                break;
+            case 2:
+                data.reference1 = *p;
+            case 3:
+                data.course2 = atof(p);
+                break;
+            case 4:
+                data.reference2 = *p;
+            case 5:
+                data.speed1 = atof(p);
+                break;
+            case 6:
+                data.units1 = *p;
+                break;
+            case 7:
+                data.speed2 = atof(p);
+                break;
+            case 8:
+                data.units2 = *p;
+                break;
+            case 9:
+                data.mode = *p;
+                break;
+            }
+            if (index<9)
+                p = strchr(p, ',') + 1;
+        } else if (*p == '$'){
+            break;
+        }
+        if(index<9)
+            index++;
+        else
+            break;
+    }
+    printf("\nCourse1: %.4f degrees %c\n", data.course1, data.reference1);
+    printf("Course2: %.4f degrees %c\n", data.course2, data.reference2);
+    printf("Speed1: %.4f degrees %c\n", data.speed1, data.units1);
+    printf("Speed2: %.4f degrees %c\n", data.speed2, data.units2);
+    printf("Mode: %c\n\n\n", data.mode);
+
+}
+
+void parse_zda(char *sentence){
+    zda_data data;
+    char *p = sentence;
+    p = strchr(p, ',') + 1;
+    int index = 1;  
+    while (p != NULL){
+        if(*p!='$' && *p!='*'){
+            switch(index){
+                case 1:
+                    data.utcTime = atof(p);
+                    break;
+                case 2:
+                    data.day = atoi(p);
+                case 3:
+                    data.month = atoi(p);
+                    break;
+                case 4:
+                    data.year = atoi(p);
+                case 5:
+                    data.localZoneHr = atoi(p);
+                    break;
+                case 6:
+                    data.localZoneMin = atoi(p);
+                    break;
+                }
+                if (index<6)
+                    p = strchr(p, ',') + 1;
+            } else if (*p == '$'){
+                break;
+            }
+        if(index<6)
+            index++;
+        else
+            break;
+    }
+    printf("\nTime(UTC): %.2f\n", data.utcTime);
+    printf("Day/Month/Year: %d/%d/%d\n", data.day, data.month, data.year);
+    printf("Local zone (hh:mm): %d:%d\n\n\n", data.localZoneHr, data.localZoneMin);
 }
